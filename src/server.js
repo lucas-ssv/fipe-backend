@@ -1,15 +1,5 @@
-require('dotenv').config();
+require('dotenv/config');
 
-const express = require('express');
-const cors = require('cors');
-const routes = require('./routes');
-
-const mongoConnect = require('./database/index');
-
-const app = express();
-
-app.use(cors());
-app.use(express.json());
-app.use(routes);
+const app = require('./app');
 
 app.listen(process.env.PORT || 3000);

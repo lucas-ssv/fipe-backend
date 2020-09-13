@@ -1,6 +1,6 @@
-const Post = require('../models/Post');
+const Post = require('../schemas/Post');
 
-const Price = require('../models/price');
+const Price = require('../schemas/Price');
 
 class CarsController {
   async index(req, res) {

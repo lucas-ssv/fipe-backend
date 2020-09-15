@@ -1,17 +1,29 @@
 const axios = require('axios');
+const Yup = require('yup');
 
 class AnnouncementController {
     async index(req, res) {
+        const schema = Yup.object().shape({
+            modelo: Yup.string().required(),
+            ano: Yup.string().required()
+        });
+
+        if (!(await schema.isValid(req.query))) {
+            return res.status(400).json({ error: 'Validation fails!' });
+        }
+
         const { 
             modelo,
             ano,
             condicao,
             transmissao,
-            ar_condicionado
+            ar_condicionado,
+            preco_minimo,
+            preco_maximo
         } = req.query;
 
         const response = await axios.get(
-            `https://api.mercadolibre.com/sites/MLB/search?category=60297&q=${modelo}%20${ano}`
+            `${process.env.ML_URL}?category=${process.env.CATEGORY}&q=${modelo}%20${ano}`
         );
 
         let announcements = [];
@@ -45,88 +57,122 @@ class AnnouncementController {
                 } else if (attr.id.includes('ITEM_CONDITION')) {
                     vehicle.item_condition = attr.value_name;
                 }
-
-                // console.log(vehicle.item_condition)
-
-                // attr.values.filter(a => {
-                //     if (a.name === condicao) {
-                //         return announcements.push(vehicle);
-                //     }
-                // });
-
-                // announcements.push(vehicle);
             });
 
-            if (condicao && !transmissao) {
-                console.log('entrou 1');
-                if (result.address.city_id.includes('TUxCQ1N')) {
+            if (result.address.city_id.includes('TUxCQ1N')) {
+                if (condicao && !transmissao) {
                     if (vehicle.fuel_type === condicao) {
                         announcements.push(vehicle);
                     }
-                }
-            } else if (condicao && transmissao) {
-                console.log('entrou 2');
-                if (result.address.city_id.includes('TUxCQ1N')) {
+                } else if (condicao && transmissao) {
                     if (vehicle.fuel_type === condicao && vehicle.transmission === transmissao) {
                         announcements.push(vehicle);
                     }
-                }
-            } else if (!condicao && transmissao) {
-                console.log('entrou 3');
-                if (result.address.city_id.includes('TUxCQ1N')) {
+                } else if (!condicao && transmissao) {
                     if (vehicle.transmission === transmissao) {
                         announcements.push(vehicle);
                     }
-                }
-            } else if (!condicao && transmissao && ar_condicionado) {
-                console.log('entrou 5');
-                if (result.address.city_id.includes('TUxCQ1N')) {
+                } else if (!condicao && transmissao && ar_condicionado) {
                     if (vehicle.transmission === transmissao && vehicle.air_conditioning === ar_condicionado) {
                         announcements.push(vehicle);
                     }
-                }
-            } else if (condicao && transmissao && ar_condicionado) {
-                console.log('entrou 6');
-                if (result.address.city_id.includes('TUxCQ1N')) {
-                    if (vehicle.fuel_type === condicao && vehicle.transmission === transmissao && vehicle.air_conditioning === ar_condicionado) {
+                } else if (condicao && transmissao && ar_condicionado) {
+                    if (vehicle.fuel_type === condicao && vehicle.transmission === transmissao &&
+                            vehicle.air_conditioning === ar_condicionado) {
                         announcements.push(vehicle);
                     }
-                }
-            } else if (!condicao && !transmissao && ar_condicionado) {
-                console.log('entrou 7');
-                if (result.address.city_id.includes('TUxCQ1N')) {
+                } else if (!condicao && !transmissao && ar_condicionado) {
                     if (vehicle.air_conditioning === ar_condicionado) {
                         announcements.push(vehicle);
                     }
-                }
-            } else {
-                console.log('entrou 8');
-                if (result.address.city_id.includes('TUxCQ1N')) {
+                } else if (preco_minimo && preco_maximo) {
+                    if (vehicle.price >= preco_minimo && vehicle.price <= preco_maximo) {
+                        announcements.push(vehicle);
+                    }
+                } else if (condicao && preco_minimo && preco_maximo) {
+                    if (vehicle.fuel_type === condicao && vehicle.price >= preco_minimo && vehicle.price <= preco_maximo) {
+                        announcements.push(vehicle);
+                    }
+                } else if (condicao && transmissao && preco_minimo && preco_maximo) {
+                    if (vehicle.fuel_type === condicao && vehicle.transmission === transmissao && 
+                            vehicle.price >= preco_minimo && vehicle.price <= preco_maximo) {
+                        announcements.push(vehicle);
+                    }
+                } else if (condicao && transmissao && ar_condicionado && preco_minimo && preco_maximo) {
+                    if (vehicle.fuel_type === condicao && vehicle.transmission === transmissao && vehicle.air_conditioning === ar_condicionado && 
+                            vehicle.price >= preco_minimo && vehicle.price <= preco_maximo) {
+                        announcements.push(vehicle);
+                    }
+                } else if (!condicao && transmissao && ar_condicionado && preco_minimo && preco_maximo) {
+                    if (vehicle.transmission === transmissao && vehicle.air_conditioning === ar_condicionado && 
+                            vehicle.price >= preco_minimo && vehicle.price <= preco_maximo) {
+                        announcements.push(vehicle);
+                    }
+                } else if (condicao && !transmissao && ar_condicionado && preco_minimo && preco_maximo) {
+                    if (vehicle.fuel_type === condicao && vehicle.air_conditioning === ar_condicionado && 
+                            vehicle.price >= preco_minimo && vehicle.price <= preco_maximo) {
+                        announcements.push(vehicle);
+                    }
+                } else if (condicao && transmissao && !ar_condicionado && preco_minimo && preco_maximo) {
+                    if (vehicle.fuel_type === condicao && vehicle.transmission === transmissao && 
+                            vehicle.price >= preco_minimo && vehicle.price <= preco_maximo) {
+                        announcements.push(vehicle);
+                    }
+                } else if (!condicao && !transmissao && ar_condicionado && preco_minimo && preco_maximo) {
+                    if (vehicle.air_conditioning === ar_condicionado && vehicle.price >= preco_minimo && vehicle.price <= preco_maximo) {
+                        announcements.push(vehicle);
+                    }
+                } else if (condicao && !transmissao && !ar_condicionado && preco_minimo && preco_maximo) {
+                    if (vehicle.fuel_type === condicao && vehicle.price >= preco_minimo && vehicle.price <= preco_maximo) {
+                        announcements.push(vehicle);
+                    }
+                } else if (!condicao && transmissao && !ar_condicionado && preco_minimo && preco_maximo) {
+                    if (vehicle.transmission === transmissao && vehicle.price >= preco_minimo && vehicle.price <= preco_maximo) {
+                        announcements.push(vehicle);
+                    }
+                } else if (!condicao && !transmissao && ar_condicionado && preco_minimo && preco_maximo) {
+                    if (vehicle.air_conditioning === ar_condicionado && vehicle.price >= preco_minimo && vehicle.price <= preco_maximo) {
+                        announcements.push(vehicle);
+                    }
+                } else {
                     announcements.push(vehicle);
                 }
+
+                if (modelo === 'Corolla') {
+                    vehicle.rating = {
+                        note: 3.9,
+                        link: 'https://www.icarros.com.br/toyota/corolla/opiniao-do-dono'
+                    }
+                } else if (modelo === 'Etios') {
+                    vehicle.rating = {
+                        note: 3.8,
+                        link: 'https://www.icarros.com.br/toyota/etios/opiniao-do-dono'
+                    }
+                } else if (modelo === 'Hilux') {
+                    vehicle.rating = {
+                        note: 3.1,
+                        link: 'https://www.icarros.com.br/toyota/hilux/opiniao-do-dono'
+                    }
+                } else if (modelo === 'Prius') {
+                    vehicle.rating = {
+                        note: 3.7,
+                        link: 'https://www.icarros.com.br/toyota/prius/opiniao-do-dono'
+                    }
+                } else if (modelo === 'SW4') {
+                    vehicle.rating = {
+                        note: 2.3,
+                        link: 'https://www.icarros.com.br/toyota/sw4/opiniao-do-dono'
+                    }
+                } else {
+                    vehicle.rating = {
+                        note: 0.0,
+                        link: null
+                    }
+                }
             }
-
-            // if (vehicle.item_condition === condicao) {
-            //     announcements.push(vehicle);
-            // }
-
-            // if (result.address.city_id.includes('TUxCQ1N')) {
-            //     announcements.push(vehicle);
-            // }
         });
 
         console.log(announcements.length);
-
-        announcements.sort((a, b) => {
-            if (a.price > b.price) {
-                return 1;
-            }
-            if (a.price < b.price) {
-                return -1;
-            }
-
-            return 0;
-        });
         
         return res.json(announcements);
     }

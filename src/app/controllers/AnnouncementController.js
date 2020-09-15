@@ -2,32 +2,36 @@ const axios = require('axios');
 
 class AnnouncementController {
     async index(req, res) {
-        const { description } = req.query;
+        const { 
+            modelo,
+            ano,
+            condicao,
+            transmissao,
+            ar_condicionado
+        } = req.query;
 
         const response = await axios.get(
-            `https://api.mercadolibre.com/sites/MLB/search?category=60297&q=${description}&limit=5`
+            `https://api.mercadolibre.com/sites/MLB/search?category=60297&q=${modelo}%20${ano}`
         );
 
-        let array = [];
+        let announcements = [];
 
-        const announcements = response.data.results;
+        const { results } = response.data;
 
-        announcements.forEach(async announcement => {
-            console.log(announcement.thumbnail);
-            
+        results.forEach(result => {        
             let vehicle = {
-                title: announcement.title,
-                price: announcement.price,
-                permalink: announcement.permalink,
-                thumbnail: announcement.thumbnail,
+                title: result.title,
+                price: result.price,
+                permalink: result.permalink,
+                thumbnail: result.thumbnail,
                 address: {
-                    state_name: announcement.address.state_name,
-                    city_name: announcement.address.city_name
+                    city_id: result.address.city_id,
+                    state_name: result.address.state_name,
+                    city_name: result.address.city_name
                 }
             };
 
-            announcement.attributes.forEach(attr => {
-                console.log(attr.id);
+            result.attributes.forEach(attr => {
                 if (attr.id.includes('TRANSMISSION')) {
                     vehicle.transmission = attr.value_name;
                 } else if (attr.id.includes('KILOMETERS')) {
@@ -41,14 +45,90 @@ class AnnouncementController {
                 } else if (attr.id.includes('ITEM_CONDITION')) {
                     vehicle.item_condition = attr.value_name;
                 }
+
+                // console.log(vehicle.item_condition)
+
+                // attr.values.filter(a => {
+                //     if (a.name === condicao) {
+                //         return announcements.push(vehicle);
+                //     }
+                // });
+
+                // announcements.push(vehicle);
             });
 
-            await array.push(vehicle);
+            if (condicao && !transmissao) {
+                console.log('entrou 1');
+                if (result.address.city_id.includes('TUxCQ1N')) {
+                    if (vehicle.fuel_type === condicao) {
+                        announcements.push(vehicle);
+                    }
+                }
+            } else if (condicao && transmissao) {
+                console.log('entrou 2');
+                if (result.address.city_id.includes('TUxCQ1N')) {
+                    if (vehicle.fuel_type === condicao && vehicle.transmission === transmissao) {
+                        announcements.push(vehicle);
+                    }
+                }
+            } else if (!condicao && transmissao) {
+                console.log('entrou 3');
+                if (result.address.city_id.includes('TUxCQ1N')) {
+                    if (vehicle.transmission === transmissao) {
+                        announcements.push(vehicle);
+                    }
+                }
+            } else if (!condicao && transmissao && ar_condicionado) {
+                console.log('entrou 5');
+                if (result.address.city_id.includes('TUxCQ1N')) {
+                    if (vehicle.transmission === transmissao && vehicle.air_conditioning === ar_condicionado) {
+                        announcements.push(vehicle);
+                    }
+                }
+            } else if (condicao && transmissao && ar_condicionado) {
+                console.log('entrou 6');
+                if (result.address.city_id.includes('TUxCQ1N')) {
+                    if (vehicle.fuel_type === condicao && vehicle.transmission === transmissao && vehicle.air_conditioning === ar_condicionado) {
+                        announcements.push(vehicle);
+                    }
+                }
+            } else if (!condicao && !transmissao && ar_condicionado) {
+                console.log('entrou 7');
+                if (result.address.city_id.includes('TUxCQ1N')) {
+                    if (vehicle.air_conditioning === ar_condicionado) {
+                        announcements.push(vehicle);
+                    }
+                }
+            } else {
+                console.log('entrou 8');
+                if (result.address.city_id.includes('TUxCQ1N')) {
+                    announcements.push(vehicle);
+                }
+            }
+
+            // if (vehicle.item_condition === condicao) {
+            //     announcements.push(vehicle);
+            // }
+
+            // if (result.address.city_id.includes('TUxCQ1N')) {
+            //     announcements.push(vehicle);
+            // }
         });
 
-        // console.log(array);
+        console.log(announcements.length);
 
-        return res.json(array);
+        announcements.sort((a, b) => {
+            if (a.price > b.price) {
+                return 1;
+            }
+            if (a.price < b.price) {
+                return -1;
+            }
+
+            return 0;
+        });
+        
+        return res.json(announcements);
     }
 }
 

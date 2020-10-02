@@ -59,41 +59,45 @@ class AnnouncementController {
                 }
             });
 
-            if (result.address.city_id.includes('TUxCQ1N')) {
-                if (condicao && !transmissao) {
+            if (result.address.city_id.includes('TUxCQ1NQ')) {
+                if (condicao && !transmissao && !ar_condicionado && !transmissao && !preco_minimo && !preco_maximo) {
                     if (vehicle.fuel_type === condicao) {
                         announcements.push(vehicle);
                     }
-                } else if (condicao && transmissao) {
+                } else if (condicao && !transmissao && ar_condicionado && !preco_minimo && !preco_maximo) {
+                    if (vehicle.fuel_type === condicao && vehicle.air_conditioning === ar_condicionado) {
+                        announcements.push(vehicle);
+                    }
+                } else if (condicao && transmissao && !ar_condicionado && !preco_minimo && !preco_maximo) {
                     if (vehicle.fuel_type === condicao && vehicle.transmission === transmissao) {
                         announcements.push(vehicle);
                     }
-                } else if (!condicao && transmissao) {
+                } else if (!condicao && transmissao && !preco_minimo && !preco_maximo) {
                     if (vehicle.transmission === transmissao) {
                         announcements.push(vehicle);
                     }
-                } else if (!condicao && transmissao && ar_condicionado) {
+                } else if (!condicao && transmissao && ar_condicionado && !preco_minimo && !preco_maximo) {
                     if (vehicle.transmission === transmissao && vehicle.air_conditioning === ar_condicionado) {
                         announcements.push(vehicle);
                     }
-                } else if (condicao && transmissao && ar_condicionado) {
+                } else if (condicao && transmissao && ar_condicionado && !preco_minimo && !preco_maximo) {
                     if (vehicle.fuel_type === condicao && vehicle.transmission === transmissao &&
                             vehicle.air_conditioning === ar_condicionado) {
                         announcements.push(vehicle);
                     }
-                } else if (!condicao && !transmissao && ar_condicionado) {
+                } else if (!condicao && !transmissao && ar_condicionado && !preco_minimo && !preco_maximo) {
                     if (vehicle.air_conditioning === ar_condicionado) {
                         announcements.push(vehicle);
                     }
-                } else if (preco_minimo && preco_maximo) {
+                } else if (preco_minimo && preco_maximo && !transmissao && !ar_condicionado && !condicao) {
                     if (vehicle.price >= preco_minimo && vehicle.price <= preco_maximo) {
                         announcements.push(vehicle);
                     }
-                } else if (condicao && preco_minimo && preco_maximo) {
+                } else if (condicao && !transmissao && !ar_condicionado && preco_minimo && preco_maximo) {
                     if (vehicle.fuel_type === condicao && vehicle.price >= preco_minimo && vehicle.price <= preco_maximo) {
                         announcements.push(vehicle);
                     }
-                } else if (condicao && transmissao && preco_minimo && preco_maximo) {
+                } else if (condicao && transmissao && !ar_condicionado && preco_minimo && preco_maximo) {
                     if (vehicle.fuel_type === condicao && vehicle.transmission === transmissao && 
                             vehicle.price >= preco_minimo && vehicle.price <= preco_maximo) {
                         announcements.push(vehicle);

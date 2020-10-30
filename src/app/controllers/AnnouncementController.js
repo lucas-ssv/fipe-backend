@@ -59,7 +59,7 @@ class AnnouncementController {
                 }
             });
 
-            if (result.seller.car_dealer && result.car_dealer_logo != '') {
+            if (result.address.state_name === 'São Paulo') {
                 if (condicao && !transmissao && !ar_condicionado && !transmissao && !preco_minimo && !preco_maximo) {
                     if (vehicle.fuel_type === condicao) {
                         announcements.push(vehicle);

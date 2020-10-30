@@ -59,7 +59,7 @@ class AnnouncementController {
                 }
             });
 
-            if (result.address.city_id.includes('TUx')) {
+            if (result.seller.car_dealer) {
                 if (condicao && !transmissao && !ar_condicionado && !transmissao && !preco_minimo && !preco_maximo) {
                     if (vehicle.fuel_type === condicao) {
                         announcements.push(vehicle);

@@ -167,6 +167,11 @@ class AnnouncementController {
                         note: 2.3,
                         link: 'https://www.icarros.com.br/toyota/sw4/opiniao-do-dono'
                     }
+                } else if (modelo === 'Rav4') {
+                    vehicle.rating = {
+                        note: 3.3,
+                        link: 'https://www.icarros.com.br/toyota/rav4/opiniao-do-dono'
+                    }
                 } else {
                     vehicle.rating = {
                         note: 0.0,

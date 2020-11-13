@@ -15,9 +15,10 @@ class AnnouncementController {
         const { 
             modelo,
             ano,
-            condicao,
-            transmissao,
             ar_condicionado,
+            unico_dono,
+            portas,
+            condicao,
             preco_minimo,
             preco_maximo
         } = req.query;
@@ -44,101 +45,184 @@ class AnnouncementController {
             };
 
             result.attributes.forEach(attr => {
-                if (attr.id.includes('TRANSMISSION')) {
-                    vehicle.transmission = attr.value_name;
-                } else if (attr.id.includes('KILOMETERS')) {
+                if (attr.id.includes('KILOMETERS')) {
                     vehicle.kilometers = attr.value_name;
                 } else if (attr.id.includes('VEHICLE_YEAR')) {
                     vehicle.year = attr.value_name;
-                } else if (attr.id.includes('FUEL_TYPE')) {
-                    vehicle.fuel_type = attr.value_name;
                 } else if (attr.id.includes('HAS_AIR_CONDITIONING')) {
                     vehicle.air_conditioning = attr.value_name;
+                } else if (attr.id.includes('SINGLE_OWNER')) {
+                    vehicle.single_owner = attr.value_name;
+                } else if (attr.id.includes('DOORS')) {
+                    vehicle.doors = attr.value_name;
                 } else if (attr.id.includes('ITEM_CONDITION')) {
                     vehicle.item_condition = attr.value_name;
                 }
             });
 
             if (result.address.state_name === 'São Paulo') {
-                if (condicao && !transmissao && !ar_condicionado && !transmissao && !preco_minimo && !preco_maximo) {
-                    if (vehicle.fuel_type === condicao) {
-                        announcements.push(vehicle);
-                    }
-                } else if (condicao && !transmissao && ar_condicionado && !preco_minimo && !preco_maximo) {
-                    if (vehicle.fuel_type === condicao && vehicle.air_conditioning === ar_condicionado) {
-                        announcements.push(vehicle);
-                    }
-                } else if (condicao && transmissao && !ar_condicionado && !preco_minimo && !preco_maximo) {
-                    if (vehicle.fuel_type === condicao && vehicle.transmission === transmissao) {
-                        announcements.push(vehicle);
-                    }
-                } else if (!condicao && transmissao && !preco_minimo && !preco_maximo) {
-                    if (vehicle.transmission === transmissao) {
-                        announcements.push(vehicle);
-                    }
-                } else if (!condicao && transmissao && ar_condicionado && !preco_minimo && !preco_maximo) {
-                    if (vehicle.transmission === transmissao && vehicle.air_conditioning === ar_condicionado) {
-                        announcements.push(vehicle);
-                    }
-                } else if (condicao && transmissao && ar_condicionado && !preco_minimo && !preco_maximo) {
-                    if (vehicle.fuel_type === condicao && vehicle.transmission === transmissao &&
-                            vehicle.air_conditioning === ar_condicionado) {
-                        announcements.push(vehicle);
-                    }
-                } else if (!condicao && !transmissao && ar_condicionado && !preco_minimo && !preco_maximo) {
+                if (ar_condicionado && !unico_dono && !portas && !condicao && !preco_minimo && !preco_maximo) {
+                    console.log('ponto 0');
                     if (vehicle.air_conditioning === ar_condicionado) {
                         announcements.push(vehicle);
                     }
-                } else if (preco_minimo && preco_maximo && !transmissao && !ar_condicionado && !condicao) {
+                } else if (!ar_condicionado && unico_dono && !portas && !condicao && !preco_minimo && !preco_maximo) {
+                    console.log('ponto 1');
+                    if (vehicle.single_owner === unico_dono) {
+                        announcements.push(vehicle);
+                    }
+                } else if (!ar_condicionado && !unico_dono && portas && !condicao && !preco_minimo && !preco_maximo) {
+                    console.log('ponto 2');
+                    if (vehicle.doors === portas) {
+                        announcements.push(vehicle);
+                    }
+                } else if (!ar_condicionado && !unico_dono && !portas && condicao && !preco_minimo && !preco_maximo) {
+                    console.log('ponto 3');
+                    if (vehicle.item_condition === condicao) {
+                        announcements.push(vehicle);
+                    }
+                } else if (!ar_condicionado && !unico_dono && !portas && !condicao && preco_minimo && preco_maximo) {
+                    console.log('ponto 4');
                     if (vehicle.price >= preco_minimo && vehicle.price <= preco_maximo) {
                         announcements.push(vehicle);
                     }
-                } else if (condicao && !transmissao && !ar_condicionado && preco_minimo && preco_maximo) {
-                    if (vehicle.fuel_type === condicao && vehicle.price >= preco_minimo && vehicle.price <= preco_maximo) {
+                } else if (ar_condicionado && unico_dono && !portas && !condicao && !preco_minimo && !preco_maximo) {
+                    console.log('ponto 5');
+                    if (vehicle.air_conditioning === ar_condicionado && vehicle.single_owner === unico_dono) {
                         announcements.push(vehicle);
                     }
-                } else if (condicao && transmissao && !ar_condicionado && preco_minimo && preco_maximo) {
-                    if (vehicle.fuel_type === condicao && vehicle.transmission === transmissao && 
-                            vehicle.price >= preco_minimo && vehicle.price <= preco_maximo) {
+                } else if (ar_condicionado && !unico_dono && portas && !condicao && !preco_minimo && !preco_maximo) {
+                    console.log('ponto 6');
+                    if (vehicle.air_conditioning === ar_condicionado && vehicle.doors === portas) {
                         announcements.push(vehicle);
                     }
-                } else if (condicao && transmissao && ar_condicionado && preco_minimo && preco_maximo) {
-                    if (vehicle.fuel_type === condicao && vehicle.transmission === transmissao && vehicle.air_conditioning === ar_condicionado && 
-                            vehicle.price >= preco_minimo && vehicle.price <= preco_maximo) {
+                } else if (ar_condicionado && !unico_dono && !portas && condicao && !preco_minimo && !preco_maximo) {
+                    console.log('ponto 7');
+                    if (vehicle.air_conditioning === ar_condicionado && vehicle.item_condition === condicao) {
                         announcements.push(vehicle);
                     }
-                } else if (!condicao && transmissao && ar_condicionado && preco_minimo && preco_maximo) {
-                    if (vehicle.transmission === transmissao && vehicle.air_conditioning === ar_condicionado && 
-                            vehicle.price >= preco_minimo && vehicle.price <= preco_maximo) {
-                        announcements.push(vehicle);
-                    }
-                } else if (condicao && !transmissao && ar_condicionado && preco_minimo && preco_maximo) {
-                    if (vehicle.fuel_type === condicao && vehicle.air_conditioning === ar_condicionado && 
-                            vehicle.price >= preco_minimo && vehicle.price <= preco_maximo) {
-                        announcements.push(vehicle);
-                    }
-                } else if (condicao && transmissao && !ar_condicionado && preco_minimo && preco_maximo) {
-                    if (vehicle.fuel_type === condicao && vehicle.transmission === transmissao && 
-                            vehicle.price >= preco_minimo && vehicle.price <= preco_maximo) {
-                        announcements.push(vehicle);
-                    }
-                } else if (!condicao && !transmissao && ar_condicionado && preco_minimo && preco_maximo) {
+                } else if (ar_condicionado && !unico_dono && !portas && !condicao && preco_minimo && preco_maximo) {
+                    console.log('ponto 8');
                     if (vehicle.air_conditioning === ar_condicionado && vehicle.price >= preco_minimo && vehicle.price <= preco_maximo) {
                         announcements.push(vehicle);
                     }
-                } else if (condicao && !transmissao && !ar_condicionado && preco_minimo && preco_maximo) {
-                    if (vehicle.fuel_type === condicao && vehicle.price >= preco_minimo && vehicle.price <= preco_maximo) {
+                } else if (ar_condicionado && unico_dono && portas && !condicao && !preco_minimo && !preco_maximo) {
+                    console.log('ponto 9');
+                    if (vehicle.air_conditioning === ar_condicionado && vehicle.single_owner === unico_dono && vehicle.doors === portas) {
                         announcements.push(vehicle);
                     }
-                } else if (!condicao && transmissao && !ar_condicionado && preco_minimo && preco_maximo) {
-                    if (vehicle.transmission === transmissao && vehicle.price >= preco_minimo && vehicle.price <= preco_maximo) {
+                } else if (ar_condicionado && !unico_dono && portas && condicao && !preco_minimo && !preco_maximo) {
+                    console.log('ponto 10');
+                    if (vehicle.air_conditioning === ar_condicionado && vehicle.doors === portas && vehicle.item_condition === condicao) {
                         announcements.push(vehicle);
                     }
-                } else if (!condicao && !transmissao && ar_condicionado && preco_minimo && preco_maximo) {
-                    if (vehicle.air_conditioning === ar_condicionado && vehicle.price >= preco_minimo && vehicle.price <= preco_maximo) {
+                } else if (ar_condicionado && unico_dono && !portas && condicao && !preco_minimo && !preco_maximo) {
+                    console.log('ponto 11');
+                    if (vehicle.air_conditioning === ar_condicionado && vehicle.single_owner === unico_dono && vehicle.item_condition === condicao) {
+                        announcements.push(vehicle);
+                    }
+                } else if (ar_condicionado && unico_dono && portas && condicao && !preco_minimo && !preco_maximo) {
+                    console.log('ponto 12');
+                    if (vehicle.air_conditioning === ar_condicionado && vehicle.single_owner === unico_dono && vehicle.doors === portas && vehicle.item_condition === condicao) {
+                        announcements.push(vehicle);
+                    }
+                } else if (ar_condicionado && unico_dono && portas && condicao && preco_minimo && preco_maximo) {
+                    console.log('ponto 13');
+                    if (vehicle.air_conditioning === ar_condicionado && vehicle.single_owner === unico_dono && vehicle.doors === portas && vehicle.item_condition === condicao
+                        && vehicle.price >= preco_minimo && vehicle.price <= preco_maximo) {
+                            announcements.push(vehicle);
+                    }
+                } else if (!ar_condicionado && unico_dono && portas && !condicao && !preco_minimo && !preco_maximo) {
+                    console.log('ponto 14');
+                    if (vehicle.single_owner === unico_dono && vehicle.doors === portas) {
+                        announcements.push(vehicle);
+                    }
+                } else if (!ar_condicionado && unico_dono && !portas && condicao && !preco_minimo && !preco_maximo) {
+                    console.log('ponto 15');
+                    if (vehicle.single_owner === unico_dono && vehicle.item_condition === condicao) {
+                        announcements.push(vehicle);
+                    }
+                } else if (!ar_condicionado && unico_dono && portas && condicao && !preco_minimo && !preco_maximo) {
+                    console.log('ponto 16');
+                    if (vehicle.single_owner === unico_dono && vehicle.doors === portas && vehicle.item_condition === condicao) {
+                        announcements.push(vehicle);
+                    }
+                } else if (!ar_condicionado && unico_dono && portas && condicao && preco_minimo && preco_maximo) {
+                    console.log('ponto 17');
+                    if (vehicle.single_owner === unico_dono && vehicle.doors === portas && vehicle.item_condition === condicao
+                        && vehicle.price >= preco_minimo && vehicle.price <= preco_maximo) {
+                        announcements.push(vehicle);
+                    }
+                } else if (!ar_condicionado && !unico_dono && portas && condicao && preco_minimo && preco_maximo) {
+                    console.log('ponto 18');
+                    if (vehicle.doors === portas && vehicle.item_condition === condicao
+                        && vehicle.price >= preco_minimo && vehicle.price <= preco_maximo) {
+                        announcements.push(vehicle);
+                    }
+                } else if (!ar_condicionado && !unico_dono && !portas && condicao && preco_minimo && preco_maximo) {
+                    console.log('ponto 19');
+                    if (vehicle.item_condition === condicao
+                        && vehicle.price >= preco_minimo && vehicle.price <= preco_maximo) {
+                        announcements.push(vehicle);
+                    }
+                } else if (!ar_condicionado && !unico_dono && portas && !condicao && preco_minimo && preco_maximo) {
+                    console.log('ponto 20');
+                    if (vehicle.doors === portas && vehicle.price >= preco_minimo && vehicle.price <= preco_maximo) {
+                        announcements.push(vehicle);
+                    }
+                } else if (ar_condicionado && !unico_dono && portas && !condicao && preco_minimo && preco_maximo) {
+                    console.log('ponto 21');
+                    if (vehicle.air_conditioning === ar_condicionado && vehicle.doors === portas && vehicle.price >= preco_minimo && vehicle.price <= preco_maximo) {
+                        announcements.push(vehicle);
+                    }
+                } else if (ar_condicionado && unico_dono && portas && !condicao && preco_minimo && preco_maximo) {
+                    console.log('ponto 22');
+                    if (vehicle.air_conditioning === ar_condicionado && vehicle.single_owner === unico_dono && vehicle.doors === portas 
+                        && vehicle.price >= preco_minimo && vehicle.price <= preco_maximo) {
+                        announcements.push(vehicle);
+                    }
+                } else if (ar_condicionado && !unico_dono && portas && condicao && preco_minimo && preco_maximo) {
+                    console.log('ponto 23');
+                    if (vehicle.air_conditioning === ar_condicionado && vehicle.doors === portas && vehicle.item_condition === condicao 
+                        && vehicle.price >= preco_minimo && vehicle.price <= preco_maximo) {
+                        announcements.push(vehicle);
+                    }
+                } else if (!ar_condicionado && unico_dono && portas && !condicao && preco_minimo && preco_maximo) {
+                    console.log('ponto 24');
+                    if (vehicle.single_owner === unico_dono && vehicle.doors === portas 
+                        && vehicle.price >= preco_minimo && vehicle.price <= preco_maximo) {
+                        announcements.push(vehicle);
+                    }
+                } else if (!ar_condicionado && unico_dono && !portas && condicao && preco_minimo && preco_maximo) {
+                    console.log('ponto 25');
+                    if (vehicle.single_owner === unico_dono && vehicle.item_condition === condicao 
+                        && vehicle.price >= preco_minimo && vehicle.price <= preco_maximo) {
+                        announcements.push(vehicle);
+                    }
+                } else if (ar_condicionado && unico_dono && !portas && condicao && preco_minimo && preco_maximo) {
+                    console.log('ponto 26');
+                    if (vehicle.air_conditioning === ar_condicionado && vehicle.single_owner === unico_dono && vehicle.item_condition === condicao 
+                        && vehicle.price >= preco_minimo && vehicle.price <= preco_maximo) {
+                        announcements.push(vehicle);
+                    }
+                } else if (!ar_condicionado && !unico_dono && portas && condicao && !preco_minimo && !preco_maximo) {
+                    console.log('ponto 27');
+                    if (vehicle.doors === portas && vehicle.item_condition === condicao) {
+                        announcements.push(vehicle);
+                    }
+                } else if (!ar_condicionado && unico_dono && !portas && !condicao && preco_minimo && preco_maximo) {
+                    console.log('ponto 28');
+                    if (vehicle.single_owner === unico_dono && vehicle.price >= preco_minimo && vehicle.price <= preco_maximo) {
+                        announcements.push(vehicle);
+                    }
+                } else if (ar_condicionado && !unico_dono && !portas && condicao && preco_minimo && preco_maximo) {
+                    console.log('ponto 29');
+                    if (vehicle.air_conditioning === ar_condicionado && vehicle.item_condition === condicao 
+                        && vehicle.price >= preco_minimo && vehicle.price <= preco_maximo) {
                         announcements.push(vehicle);
                     }
                 } else {
+                    console.log('ponto 38');
                     announcements.push(vehicle);
                 }
 
